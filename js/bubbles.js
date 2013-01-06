@@ -1,42 +1,67 @@
-$(function () {
+jQuery(document).ready(function () {
     'use strict';
-    var images = [];
+    var images = [],
+        mouseX,
+        mouseY,
+        createAndMoveImages = function (e) {
+            var createImageDiv = function () {
+                var createImage = function () {
+                    var imageNode, heightWidthRatio;
 
-    $(document).mousemove(function (e) {
-        var createImageDiv, imageDiv, divNode;
+                    imageNode = document.createElement('img');
+                    imageNode.src = 'http://littleguurrl.files.' +
+                        'wordpress.com/2012/01/598270.jpg?w=584';
 
-        createImageDiv = function () {
-            var createImage, imageDivNode, imageNode;
+                    heightWidthRatio = imageNode.height / imageNode.width;
+                    imageNode.height = Math.random() * 100;
+                    imageNode.width = imageNode.height * heightWidthRatio;
 
-            createImage = function () {
-                var imageNode, heightWidthRatio;
+                    return imageNode;
+                },
+                    imageNode = createImage(),
+                    imageDivNode = document.createElement('div');
 
-                imageNode = document.createElement('img');
-                imageNode.src = 'http://littleguurrl.files.' +
-                    'wordpress.com/2012/01/598270.jpg?w=584';
+                imageDivNode.appendChild(imageNode);
 
-                heightWidthRatio = imageNode.height / imageNode.width;
-                imageNode.height = (Math.random() / Math.random()) % 100;
-                imageNode.width = imageNode.height * heightWidthRatio;
+                imageDivNode.className = 'image'
+                imageDivNode.style.position = 'absolute';
+                imageDivNode.style.left = mouseX - imageNode.width;
+                imageDivNode.style.top = mouseY - imageNode.height;
 
-                return imageNode;
-            };
+                return imageDivNode;
+            },
+                moveImages = function () {
+                    $('.image').each(function () {
+                        var leftRight = Math.random() > .5 ? true : false,
+                            moveY = '-=30',
+                            moveX = leftRight ? '-=10' : '+=10';
 
-            imageNode = createImage()
-            imageDivNode = document.createElement('div');
-            imageDivNode.appendChild(imageNode);
+                        $(this).animate(
+                            {
+                                top: moveY,
+                                left: moveX
+                            },
+                            1
+                        );
+                        if(parseInt(this.style.top) < 0) {
+                            this.className = 'del';
+                        }
+                    });
 
-            imageDivNode.style.position = 'absolute';
-            imageDivNode.style.left = e.pageX - imageNode.width;
-            imageDivNode.style.top = e.pageY - imageNode.height;
+                    $('.del').remove();
+                },
+                imageDiv = createImageDiv();
 
-            return imageDivNode;
+            document.body.appendChild(imageDiv);
+            moveImages()
+
+            setTimeout(createAndMoveImages, 50);
         };
 
-        imageDiv = createImageDiv();
-        divNode = document.createElement('div');
-
-        document.body.appendChild(imageDiv);
-        images.push(imageDiv);
+    $(document).mousemove(function (e) {
+        mouseX = e.pageX;
+        mouseY = e.pageY;
     });
+
+    createAndMoveImages();
 });
